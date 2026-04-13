@@ -78,13 +78,14 @@ curl -X POST http://localhost:3000/api/appointments \
 
 ## 📸 Screenshot
 
-<!-- Add a screenshot of your app here -->
-<!-- ![App Screenshot](screenshot.png) -->
+<img width="1351" height="633" alt="image" src="https://github.com/user-attachments/assets/812d046c-72be-45f7-9cee-7f28717b183f" />
+
 
 ## 👥 Contributors
 
 - **Naman** — Developer
+- **Suhani** - Developer
 
 ## 📄 License
 
-This project is for educational purposes (RBU College — TCB).
+This project is for educational purposes.
