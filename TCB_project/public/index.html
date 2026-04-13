@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Appointment Scheduler — Book, view, and manage your appointments with ease.">
+    <title>Appointment Scheduler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <!-- Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header" id="app-header">
+            <div class="header-glow"></div>
+            <h1>📅 Appointment Scheduler</h1>
+            <p class="subtitle">Book, view, and manage your appointments effortlessly</p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-grid">
+
+            <!-- Booking Panel -->
+            <section class="card booking-card" id="booking-section">
+                <div class="card-header">
+                    <span class="card-icon">✨</span>
+                    <h2>Book Appointment</h2>
+                </div>
+                <form id="booking-form" autocomplete="off">
+                    <div class="form-group">
+                        <label for="clientName">Client Name</label>
+                        <input type="text" id="clientName" name="clientName" placeholder="Enter client name" required>
+                    </div>
+                    <div class="time-row">
+                        <div class="form-group">
+                            <label for="startTime">Start Hour</label>
+                            <select id="startTime" name="startTime" required></select>
+                        </div>
+                        <div class="time-arrow">→</div>
+                        <div class="form-group">
+                            <label for="endTime">End Hour</label>
+                            <select id="endTime" name="endTime" required></select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="book-btn">
+                        <span class="btn-text">Book Appointment</span>
+                        <span class="btn-loader" hidden></span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Appointments List Panel -->
+            <section class="card appointments-card" id="appointments-section">
+                <div class="card-header">
+                    <span class="card-icon">📋</span>
+                    <h2>Scheduled Appointments</h2>
+                    <span class="badge" id="apt-count">0</span>
+                </div>
+                <div id="appointments-list" class="appointments-list">
+                    <div class="empty-state" id="empty-state">
+                        <div class="empty-icon">🗓️</div>
+                        <p>No appointments scheduled yet</p>
+                        <span>Book your first appointment to get started!</span>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            <p>Appointment Scheduler &copy; 2026 &mdash; Built with Express.js</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
