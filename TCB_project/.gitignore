@@ -15,3 +15,9 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Database
+appointments.db
+
+# Gemini
+.gemini/

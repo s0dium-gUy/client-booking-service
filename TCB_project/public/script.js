@@ -56,16 +56,17 @@ function renderAppointments(appointments) {
     listContainer.innerHTML = '';
 
     appointments.forEach(apt => {
+        const aptId = apt.id || apt.appointmentID;
         const item = document.createElement('div');
         item.className = 'apt-item';
-        item.id = `apt-${apt.appointmentID}`;
+        item.id = `apt-${aptId}`;
         item.innerHTML = `
-            <div class="apt-id">#${apt.appointmentID}</div>
+            <div class="apt-id">#${aptId}</div>
             <div class="apt-details">
                 <div class="apt-name">${escapeHTML(apt.clientName)}</div>
                 <div class="apt-time"><span>${formatHour(apt.startTime)}</span> — <span>${formatHour(apt.endTime)}</span></div>
             </div>
-            <button class="btn btn-cancel" data-id="${apt.appointmentID}" title="Cancel appointment">Cancel</button>
+            <button class="btn btn-cancel" data-id="${aptId}" title="Cancel appointment">Cancel</button>
         `;
         listContainer.appendChild(item);
     });
