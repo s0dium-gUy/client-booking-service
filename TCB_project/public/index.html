@@ -24,7 +24,7 @@
         <!-- Header -->
         <header class="header" id="app-header">
             <div class="header-glow"></div>
-            <h1>📅 Appointment Scheduler</h1>
+            <h1>Appointment Scheduler</h1>
             <p class="subtitle">Book, view, and manage your appointments effortlessly</p>
         </header>
 
@@ -40,18 +40,25 @@
                 <form id="booking-form" autocomplete="off">
                     <div class="form-group">
                         <label for="clientName">Client Name</label>
-                        <input type="text" id="clientName" name="clientName" placeholder="Enter client name" required>
+                        <input type="text" id="clientName" name="clientName" placeholder="Letters only (e.g. John Doe)" pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" required>
+                        <span class="field-hint" id="name-hint">Only letters and spaces allowed</span>
                     </div>
-                    <div class="time-row">
-                        <div class="form-group">
-                            <label for="startTime">Start Hour</label>
-                            <select id="startTime" name="startTime" required></select>
-                        </div>
-                        <div class="time-arrow">→</div>
-                        <div class="form-group">
-                            <label for="endTime">End Hour</label>
-                            <select id="endTime" name="endTime" required></select>
-                        </div>
+                    <div class="form-group">
+                        <label for="startTime">Start Time</label>
+                        <select id="startTime" name="startTime" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration</label>
+                        <select id="duration" name="duration" required>
+                            <option value="15">15 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60" selected>1 hour</option>
+                        </select>
+                    </div>
+                    <div class="time-summary" id="time-summary">
+                        <span class="summary-label">Appointment:</span>
+                        <span class="summary-value" id="summary-value">9:00 AM — 10:00 AM</span>
                     </div>
                     <button type="submit" class="btn btn-primary" id="book-btn">
                         <span class="btn-text">Book Appointment</span>

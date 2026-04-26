@@ -6,14 +6,10 @@ const app = express();
 const PORT = 3000;
 
 // ─── DATABASE SETUP ───────────────────────────────────────
-// Creates a file called 'appointments.db' in the project folder
-// If the file already exists, it just connects to it
 const db = new Database(path.join(__dirname, 'appointments.db'));
-
-// Enable WAL mode for better performance
 db.pragma('journal_mode = WAL');
 
-// Create the appointments table if it doesn't exist yet
+// Store times in total minutes (e.g., 9:30 AM = 570 minutes)
 db.exec(`
     CREATE TABLE IF NOT EXISTS appointments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,7 +19,7 @@ db.exec(`
     )
 `);
 
-// Prepare reusable SQL statements (faster than writing SQL each time)
+// Prepared SQL statements
 const getAllStmt = db.prepare('SELECT * FROM appointments ORDER BY startTime');
 const getByIdStmt = db.prepare('SELECT * FROM appointments WHERE id = ?');
 const insertStmt = db.prepare('INSERT INTO appointments (clientName, startTime, endTime) VALUES (?, ?, ?)');
@@ -33,6 +29,18 @@ const checkOverlapStmt = db.prepare(`
     WHERE (? >= startTime AND ? < endTime) 
        OR (? > startTime AND ? <= endTime)
 `);
+
+// ─── VALIDATION HELPERS ──────────────────────────────────
+
+// Only letters and spaces allowed in client name
+function isValidName(name) {
+    return /^[A-Za-z\s]+$/.test(name);
+}
+
+// Valid time must be in minutes (0–1425, i.e., 00:00 to 23:45)
+function isValidTime(minutes) {
+    return Number.isInteger(minutes) && minutes >= 0 && minutes <= 1425 && minutes % 15 === 0;
+}
 
 // Middleware
 app.use(express.json());
@@ -60,27 +68,34 @@ app.get('/api/appointments', (req, res) => {
 app.post('/api/appointments', (req, res) => {
     const { clientName, startTime, endTime } = req.body;
 
-    // Validation
+    // Validate client name
     if (!clientName || clientName.trim() === '') {
         return res.status(400).json({ success: false, message: 'Client name is required' });
+    }
+
+    if (!isValidName(clientName.trim())) {
+        return res.status(400).json({ success: false, message: 'Client name must contain only letters and spaces' });
     }
 
     const start = parseInt(startTime);
     const end = parseInt(endTime);
 
-    if (isNaN(start) || isNaN(end)) {
-        return res.status(400).json({ success: false, message: 'Start and end times must be valid numbers (0-23)' });
-    }
-
-    if (start < 0 || start > 23 || end < 0 || end > 23) {
-        return res.status(400).json({ success: false, message: 'Times must be between 0 and 23' });
+    // Validate times (now in minutes)
+    if (!isValidTime(start) || !isValidTime(end)) {
+        return res.status(400).json({ success: false, message: 'Times must be in valid 15-minute intervals (0-1425)' });
     }
 
     if (start >= end) {
         return res.status(400).json({ success: false, message: 'Start time must be before end time' });
     }
 
-    // Check for overlapping time slots in the database
+    // Check duration is a valid multiple (15, 30, 45, or 60 minutes)
+    const duration = end - start;
+    if (![15, 30, 45, 60].includes(duration)) {
+        return res.status(400).json({ success: false, message: 'Appointment duration must be 15, 30, 45, or 60 minutes' });
+    }
+
+    // Check for overlapping time slots
     const overlap = checkOverlapStmt.get(start, start, end, end);
     if (overlap) {
         return res.status(409).json({ success: false, message: 'This time slot overlaps with an existing appointment' });
@@ -93,7 +108,7 @@ app.post('/api/appointments', (req, res) => {
         success: true,
         message: 'Appointment booked successfully',
         appointment: {
-            appointmentID: result.lastInsertRowid,
+            id: result.lastInsertRowid,
             clientName: clientName.trim(),
             startTime: start,
             endTime: end
@@ -109,20 +124,18 @@ app.delete('/api/appointments/:id', (req, res) => {
         return res.status(400).json({ success: false, message: 'Invalid appointment ID' });
     }
 
-    // Check if the appointment exists
     const appointment = getByIdStmt.get(id);
     if (!appointment) {
         return res.status(404).json({ success: false, message: `No appointment found with ID: ${id}` });
     }
 
-    // Delete from database
     deleteStmt.run(id);
 
     res.json({
         success: true,
         message: `Appointment ID: ${id} has been successfully cancelled`,
         appointment: {
-            appointmentID: appointment.id,
+            id: appointment.id,
             clientName: appointment.clientName,
             startTime: appointment.startTime,
             endTime: appointment.endTime
@@ -133,12 +146,12 @@ app.delete('/api/appointments/:id', (req, res) => {
 // Gracefully close the database when the server stops
 process.on('SIGINT', () => {
     db.close();
-    console.log('\n📦 Database connection closed.');
+    console.log('\n Database connection closed.');
     process.exit(0);
 });
 
 // Start the server
 app.listen(PORT, () => {
     console.log(`\n Appointment Scheduler is running at http://localhost:${PORT}`);
-    console.log(`📦 SQLite database: appointments.db\n`);
+    console.log(` SQLite database: appointments.db\n`);
 });
