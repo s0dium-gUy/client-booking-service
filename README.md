@@ -41,8 +41,8 @@ TCB_project/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/TCB_project.git
-   cd TCB_project
+   git clone https://github.com/your-username/client-booking-service.git
+   cd client-booking-service
    ```
 
 2. **Install dependencies**
